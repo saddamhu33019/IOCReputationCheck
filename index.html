@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bulk IP Reputation Checker</title>
+</head>
+<body>
+  <h1>Bulk IP Reputation Checker</h1>
+  <textarea id="ipList" rows="10" cols="50" placeholder="Enter IPs, one per line"></textarea><br><br>
+  <button onclick="checkIPs()">Check IP Reputation</button>
+  <div id="results"></div>
+
+  <script>
+    async function checkIPs() {
+      const ipList = document.getElementById('ipList').value.trim().split('\n');
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = '<p>Checking...</p>';
+
+      let results = '<table border="1"><tr><th>IP</th><th>Status</th></tr>';
+      
+      for (const ip of ipList) {
+        try {
+          // Replace with your API endpoint and key
+          const res = await fetch(`https://api.abuseipdb.com/api/v2/check?ipAddress=${ip}`, {
+            headers: {
+              'Key': 'YOUR_API_KEY',
+              'Accept': 'application/json'
+            }
+          });
+
+          if (!res.ok) throw new Error('API error');
+          const data = await res.json();
+          results += `<tr><td>${ip}</td><td>${data.data.abuseConfidenceScore}% abuse</td></tr>`;
+        } catch (e) {
+          results += `<tr><td>${ip}</td><td>Error: ${e.message}</td></tr>`;
+        }
+      }
+
+      results += '</table>';
+      resultsDiv.innerHTML = results;
+    }
+  </script>
+</body>
+</html>
